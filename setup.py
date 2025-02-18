@@ -37,13 +37,13 @@ else:
     print(f"No {requirements_file} found. Skipping dependency installation.")
 
 # Step 5: Add Virtual Environment to Jupyter as a Kernel
-kernel_name = "Python (.venv)"
+kernel_name = "Python (forecasting)"
 print(f"Adding Jupyter kernel: {kernel_name}...")
-run_command(f"{python_cmd} -m ipykernel install --user --name=.venv --display-name \"{kernel_name}\"")
+run_command(f"{python_cmd} -m ipykernel install --user --name=forecasting --display-name \"{kernel_name}\"")
 
 print("\n✅ Virtual environment, dependencies, and Jupyter kernel setup complete!")
 print("To activate your virtual environment, use:")
 print(f"  source {venv_name}/bin/activate  # (Mac/Linux)")
-print(f"  {venv_name}\\Scripts\\activate  # (Windows)")
+print(f"  {venv_name}\\Scripts\\activate   # (Windows)")
 print("To start Jupyter Notebook, run:")
 print("  jupyter notebook")
