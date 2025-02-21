@@ -7521,7 +7521,7 @@ main {
 </div>
 </div>
 </div>
-</div>
+</div></section></section><section><section>
 <div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
@@ -7530,7 +7530,7 @@ main {
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
 <h2 id="Using-PKU-cluster">Using PKU cluster<a class="anchor-link" href="#Using-PKU-cluster">¶</a></h2><ul>
 <li><p>Apply for an account in the PKU HPC teaching cluster online</p>
-<p><a href="http://hpc.pku.edu.cn/apply_edu_login.html">http://hpc.pku.edu.cn/apply_edu_login.html</a></p>
+<p><a href="http://scow-jx2.pku.edu.cn/">http://scow-jx2.pku.edu.cn/</a></p>
 </li>
 <li><p>Login to the cluster</p>
 <ul>
@@ -7551,26 +7551,14 @@ main {
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h2 id="Run-a-remote-Jupyter-Notebook-using-the-SSH-tunnel">Run a remote Jupyter Notebook using the SSH tunnel<a class="anchor-link" href="#Run-a-remote-Jupyter-Notebook-using-the-SSH-tunnel">¶</a></h2><ul>
-<li>Login to a remote server</li>
+<h2 id="Run-a-remote-Jupyter-Notebook-or-using-the-SSH-tunnel">Run a remote Jupyter Notebook or using the SSH tunnel<a class="anchor-link" href="#Run-a-remote-Jupyter-Notebook-or-using-the-SSH-tunnel">¶</a></h2><ul>
+<li>Using the terminal to login to a remote server</li>
 </ul>
-<div class="highlight"><pre><span></span>ssh<span class="w"> </span><span class="m">2400123456</span>@wmjx2-login.pku.edu.cn
+<div class="highlight"><pre><span></span>ssh<span class="w"> </span><span class="m">2412345678</span>@wmjx2-login.pku.edu.cn
 </pre></div>
 <ul>
-<li>Start a Jupyter Notebook on the server</li>
-</ul>
-<div class="highlight"><pre><span></span>jupyter<span class="w"> </span>notebook<span class="w"> </span>--port<span class="w"> </span><span class="m">8888</span>
-</pre></div>
-<p>Also, copy the string like <code>http://localhost:8888/?token=a373718460df0437c443eeadb7250e7793d6524f80f129cc</code> printed on the terminal.</p>
-<ul>
-<li>Start a terminal on your <strong>local machine</strong> and run:</li>
-</ul>
-<div class="highlight"><pre><span></span>ssh<span class="w"> </span>-L<span class="w"> </span><span class="m">8888</span>:127.0.0.1:8888<span class="w"> </span>-N<span class="w"> </span><span class="m">2400123456</span>@wmjx2-login.pku.edu.cn
-</pre></div>
-<p>where <code>8888:127.0.0.1:8888</code> means forwarding your remote server's <code>8888</code> port to your local machine's port <code>8888</code>, <code>-N</code> to avoid login to a shell on the remote.</p>
-<ul>
-<li><p>Open your browser in your local machine and connect to the remote Jupyter Notebook server locally with the link</p>
-<p><a href="http://localhost:8888/?token=a373718460df0437c443eeadb7250e7793d6524f80f129cc">http://localhost:8888/?token=a373718460df0437c443eeadb7250e7793d6524f80f129cc</a></p>
+<li><p>Start a Jupyter Application on the PKU server</p>
+<p><a href="https://scow-jx2.pku.edu.cn/apps/jx2/createApps">https://scow-jx2.pku.edu.cn/apps/jx2/createApps</a></p>
 </li>
 </ul>
 </div>
