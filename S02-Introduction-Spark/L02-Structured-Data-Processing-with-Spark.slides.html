@@ -7635,7 +7635,7 @@ To adjust logging level use sc.setLogLevel(newLevel). For SparkR, use setLogLeve
 <div class="jp-InputPrompt jp-InputArea-prompt">In [12]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-ipython3"><pre><span></span><span class="n">sdf</span> <span class="o">=</span> <span class="n">spark</span><span class="o">.</span><span class="n">read</span><span class="o">.</span><span class="n">csv</span><span class="p">(</span><span class="s2">"..//data/m5-forecasting-accuracy/calendar.csv"</span><span class="p">,</span> <span class="n">header</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="c1"># read files</span>
+<div class="highlight hl-ipython3"><pre><span></span><span class="n">sdf</span> <span class="o">=</span> <span class="n">spark</span><span class="o">.</span><span class="n">read</span><span class="o">.</span><span class="n">csv</span><span class="p">(</span><span class="s2">"../data/m5-forecasting-accuracy/calendar.csv"</span><span class="p">,</span> <span class="n">header</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="c1"># read files</span>
 <span class="c1"># sdf = spark.read.csv("file:///nfs-share/home/2406184221/bdcf-slides/data/m5-forecasting-accuracy/calendar.csv") # or use the full path</span>
 <span class="n">sdf</span><span class="o">.</span><span class="n">show</span><span class="p">()</span> <span class="c1"># Displays the content of the DataFrame to stdout</span>
 </pre></div>
@@ -7762,8 +7762,8 @@ require(
             transition: "fade",
             slideNumber: "",
             plugins: [RevealNotes],
-            width: 1600,
-			      height: 900,
+            width: 1366,
+			      height: 768,
 
         });
 

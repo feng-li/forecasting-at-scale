@@ -7730,6 +7730,30 @@ main {
 </div>
 </div>
 </div>
+</div></section></section><section><section>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<h2 id="Install-Python-modules-on-PKU-HPC">Install Python modules on PKU HPC<a class="anchor-link" href="#Install-Python-modules-on-PKU-HPC">¶</a></h2><ul>
+<li><p>The running nodes (the Jupyter Notebook) do not have internet access</p>
+</li>
+<li><p>One has to install everything from the login node using proper version of Python pip</p>
+<ul>
+<li><p>In the <strong>Jupyter</strong>, use <code>os.path.dirname(sys.executable)</code> to allocate the path for pip. It returns something like</p>
+<pre><code>/nfs-share/software/anaconda/2020.02/envs/python3.12/bin</code></pre>
+</li>
+<li><p>In the <strong>login node</strong>, run like</p>
+<pre><code>/nfs-share/software/anaconda/2020.02/envs/python3.12/bin/pip install statsmodels</code></pre>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+</div>
 </div></section></section><section><section><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
@@ -7852,8 +7876,8 @@ require(
             transition: "fade",
             slideNumber: "",
             plugins: [RevealNotes],
-            width: 1600,
-			      height: 900,
+            width: 1366,
+			      height: 768,
 
         });
 

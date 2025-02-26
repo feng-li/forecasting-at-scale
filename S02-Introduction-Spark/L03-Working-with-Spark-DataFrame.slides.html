@@ -7456,36 +7456,26 @@ main {
 </div>
 </div>
 </div>
-</div><div class="fragment"><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
+</div><div class="fragment"><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [2]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In [6]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-ipython3"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">pyspark.sql</span><span class="w"> </span><span class="kn">import</span> <span class="n">SparkSession</span>
+<div class="highlight hl-ipython3"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">os</span><span class="o">,</span><span class="w"> </span><span class="nn">sys</span> <span class="c1"># Ensure All environment variables are properly set </span>
+<span class="c1"># os.environ["JAVA_HOME"] = os.path.dirname(sys.executable)</span>
+<span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">"PYSPARK_PYTHON"</span><span class="p">]</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">executable</span>
+<span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">"PYSPARK_DRIVER_PYTHON"</span><span class="p">]</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">executable</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">pyspark.sql</span><span class="w"> </span><span class="kn">import</span> <span class="n">SparkSession</span> <span class="c1"># build Spark Session</span>
 <span class="n">spark</span> <span class="o">=</span> <span class="n">SparkSession</span><span class="o">.</span><span class="n">builder</span>\
         <span class="o">.</span><span class="n">config</span><span class="p">(</span><span class="s2">"spark.ui.enabled"</span><span class="p">,</span> <span class="s2">"false"</span><span class="p">)</span>  \
         <span class="o">.</span><span class="n">config</span><span class="p">(</span><span class="s2">"spark.executor.memory"</span><span class="p">,</span> <span class="s2">"2g"</span><span class="p">)</span>\
         <span class="o">.</span><span class="n">config</span><span class="p">(</span><span class="s2">"spark.cores.max"</span><span class="p">,</span> <span class="s2">"2"</span><span class="p">)</span>\
         <span class="o">.</span><span class="n">appName</span><span class="p">(</span><span class="s2">"Spark DataFrame"</span><span class="p">)</span><span class="o">.</span><span class="n">getOrCreate</span><span class="p">()</span> <span class="c1"># using spark server</span>
 </pre></div>
-</div>
-</div>
-</div>
-</div>
-<div class="jp-Cell-outputWrapper">
-<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
-</div>
-<div class="jp-OutputArea jp-Cell-outputArea">
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="application/vnd.jupyter.stderr" tabindex="0">
-<pre>Setting default log level to "WARN".
-To adjust logging level use sc.setLogLevel(newLevel). For SparkR, use setLogLevel(newLevel).
-25/02/23 21:39:28 WARN NativeCodeLoader: Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
-</pre>
 </div>
 </div>
 </div>
@@ -7501,9 +7491,10 @@ To adjust logging level use sc.setLogLevel(newLevel). For SparkR, use setLogLeve
 <ul>
 <li><p>If you have trouble starting a PySpark interactive session due to a system limitation, make sure you have disabled Spark UI <code>.config("spark.ui.enabled", "false")</code></p>
 </li>
-<li><p>You could also submit your Spark Job via the <code>spark-submit</code> command in HPC server (more details later).</p>
+<li><p>You could also submit your Spark Job via the <code>spark-submit</code> command in PKU HPC server (more details later).</p>
 <div class="highlight"><pre><span></span><span class="nb">export</span><span class="w"> </span><span class="nv">JAVA_HOME</span><span class="o">=</span>/nfs-share/software/anaconda/2020.02/envs/python3.12/bin
-<span class="nb">export</span><span class="w"> </span>PYSPARK-PYTHON<span class="o">=</span>/nfs-share/software/anaconda/2020.02/envs/python3.12/bin/python
+<span class="nb">export</span><span class="w"> </span><span class="nv">PYSPARK_PYTHON</span><span class="o">=</span>/nfs-share/software/anaconda/2020.02/envs/python3.12/bin/python
+<span class="nb">export</span><span class="w"> </span><span class="nv">PYSPARK_DRIVER_PYTHON</span><span class="o">=</span><span class="nv">$PYSPARK_PYTHON</span>
 /nfs-share/software/anaconda/2020.02/envs/python3.12/bin/spark-submit<span class="w"> </span><span class="se">\</span>
 <span class="w">    </span>--conf<span class="w"> </span>spark.ui.enabled<span class="o">=</span><span class="nb">false</span><span class="w">     </span><span class="se">\</span>
 <span class="w">    </span>your-pyspark-code.py<span class="w">         </span>
@@ -7518,10 +7509,10 @@ To adjust logging level use sc.setLogLevel(newLevel). For SparkR, use setLogLeve
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [25]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In [7]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-ipython3"><pre><span></span><span class="n">sdf</span> <span class="o">=</span> <span class="n">spark</span><span class="o">.</span><span class="n">read</span><span class="o">.</span><span class="n">csv</span><span class="p">(</span><span class="s2">"..//data/m5-forecasting-accuracy/calendar.csv"</span><span class="p">,</span> <span class="n">header</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">inferSchema</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="c1"># read files</span>
+<div class="highlight hl-ipython3"><pre><span></span><span class="n">sdf</span> <span class="o">=</span> <span class="n">spark</span><span class="o">.</span><span class="n">read</span><span class="o">.</span><span class="n">csv</span><span class="p">(</span><span class="s2">"../data/m5-forecasting-accuracy/calendar.csv"</span><span class="p">,</span> <span class="n">header</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">inferSchema</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="c1"># read files</span>
 <span class="n">sdf</span><span class="o">.</span><span class="n">show</span><span class="p">()</span> <span class="c1"># Displays the content of the DataFrame to stdout</span>
 </pre></div>
 </div>
@@ -8451,8 +8442,8 @@ require(
             transition: "fade",
             slideNumber: "",
             plugins: [RevealNotes],
-            width: 1600,
-			      height: 900,
+            width: 1366,
+			      height: 768,
 
         });
 
