@@ -1,7 +1,7 @@
 all: slides zip sync
 
 slides:
-	jupyter-nbconvert **/L*.ipynb  --to slides  --SlidesExporter.reveal_theme=solarized --SlidesExporter.reveal_scroll=True --SlidesExporter.reveal_transition=fade --SlidesExporter.reveal_width=1600 --SlidesExporter.reveal_height=900
+	jupyter-nbconvert **/L*.ipynb  --to slides  --SlidesExporter.reveal_theme=solarized --SlidesExporter.reveal_scroll=True --SlidesExporter.reveal_transition=fade --SlidesExporter.reveal_width=1366 --SlidesExporter.reveal_height=768
 
 html:
 	jupyter-nbconvert **/**.ipynb  --to html
