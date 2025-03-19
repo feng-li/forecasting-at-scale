@@ -7445,12 +7445,12 @@ main {
 </div>
 </div>
 </div>
-</div></section></section><section><section><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
+</div></section></section><section><section><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In [1]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
 <div class="highlight hl-ipython3"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">os</span><span class="o">,</span><span class="w"> </span><span class="nn">sys</span> <span class="c1"># Ensure All environment variables are properly set </span>
@@ -7474,6 +7474,41 @@ main {
     <span class="o">.</span><span class="n">appName</span><span class="p">(</span><span class="s2">"Spark Forecasting"</span><span class="p">)</span><span class="o">.</span><span class="n">getOrCreate</span><span class="p">()</span>
 <span class="n">spark</span>
 </pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell-outputWrapper">
+<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
+</div>
+<div class="jp-OutputArea jp-Cell-outputArea">
+<div class="jp-OutputArea-child">
+<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="application/vnd.jupyter.stderr" tabindex="0">
+<pre>Setting default log level to "WARN".
+To adjust logging level use sc.setLogLevel(newLevel). For SparkR, use setLogLevel(newLevel).
+25/03/19 14:06:27 WARN NativeCodeLoader: Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+</pre>
+</div>
+</div>
+<div class="jp-OutputArea-child jp-OutputArea-executeResult">
+<div class="jp-OutputPrompt jp-OutputArea-prompt">Out[1]:</div>
+<div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/html" tabindex="0">
+<div>
+<p><b>SparkSession - in-memory</b></p>
+<div>
+<p><b>SparkContext</b></p>
+<p><a href="None">Spark UI</a></p>
+<dl>
+<dt>Version</dt>
+<dd><code>v3.5.3</code></dd>
+<dt>Master</dt>
+<dd><code>local[*]</code></dd>
+<dt>AppName</dt>
+<dd><code>Spark Forecasting</code></dd>
+</dl>
+</div>
+</div>
 </div>
 </div>
 </div>
@@ -7558,7 +7593,7 @@ main {
 <div class="jp-OutputArea-child">
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="application/vnd.jupyter.stderr" tabindex="0">
-<pre>25/03/18 20:26:40 WARN SparkStringUtils: Truncated the string representation of a plan since it was too large. This behavior can be adjusted by setting 'spark.sql.debug.maxToStringFields'.
+<pre>25/03/19 14:06:33 WARN SparkStringUtils: Truncated the string representation of a plan since it was too large. This behavior can be adjusted by setting 'spark.sql.debug.maxToStringFields'.
                                                                                 </pre>
 </div>
 </div>
@@ -7588,12 +7623,6 @@ only showing top 5 rows
 only showing top 5 rows
 
 </pre>
-</div>
-</div>
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="application/vnd.jupyter.stderr" tabindex="0">
-<pre>[Stage 7:&gt;                                                          (0 + 1) / 1]                                                                                </pre>
 </div>
 </div>
 </div>
@@ -8144,6 +8173,8 @@ only showing top 20 rows
   warnings.warn(
 /nfs-share/home/2406184221/.local/lib/python3.12/site-packages/statsmodels/tsa/holtwinters/model.py:918: ConvergenceWarning: Optimization failed to converge. Check mle_retvals.
   warnings.warn(
+/nfs-share/home/2406184221/.local/lib/python3.12/site-packages/statsmodels/tsa/holtwinters/model.py:918: ConvergenceWarning: Optimization failed to converge. Check mle_retvals.
+  warnings.warn(
                                                                                 </pre>
 </div>
 </div>
@@ -8271,7 +8302,7 @@ only showing top 20 rows
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [9]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In [7]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
 <div class="highlight hl-ipython3"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">pyspark.sql.functions</span><span class="w"> </span><span class="kn">import</span> <span class="n">col</span>
@@ -8294,7 +8325,7 @@ only showing top 20 rows
 </div>
 <div class="jp-OutputArea jp-Cell-outputArea">
 <div class="jp-OutputArea-child jp-OutputArea-executeResult">
-<div class="jp-OutputPrompt jp-OutputArea-prompt">Out[9]:</div>
+<div class="jp-OutputPrompt jp-OutputArea-prompt">Out[7]:</div>
 <div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/html" tabindex="0">
 <div>
 <style scoped="">
@@ -8615,7 +8646,7 @@ only showing top 20 rows
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [10]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In [8]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
 <div class="highlight hl-ipython3"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">pyspark.sql.functions</span><span class="w"> </span><span class="kn">import</span> <span class="n">expr</span>
@@ -8678,7 +8709,7 @@ only showing top 20 rows
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [12]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In [9]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
 <div class="highlight hl-ipython3"><pre><span></span><span class="c1"># Bottom up</span>
@@ -8757,7 +8788,7 @@ only showing top 20 rows
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [18]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In [12]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
 <div class="highlight hl-ipython3"><pre><span></span><span class="c1"># Map test data to Parent_Group using summing matrix</span>
@@ -8770,10 +8801,10 @@ only showing top 20 rows
     <span class="n">spark_sum</span><span class="p">(</span><span class="n">col</span><span class="p">(</span><span class="s2">"Forecast"</span><span class="p">)</span> <span class="o">*</span> <span class="n">col</span><span class="p">(</span><span class="s2">"Weight"</span><span class="p">))</span><span class="o">.</span><span class="n">alias</span><span class="p">(</span><span class="s2">"Reconciled_Forecast"</span><span class="p">)</span>
 <span class="p">)</span>
 
-<span class="c1"># Merge test data with reconciled forecasts</span>
-<span class="n">evaluation_sdf</span> <span class="o">=</span> <span class="n">test_grouped_sdf</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
-    <span class="n">reconciled_forecast_sdf</span><span class="p">,</span> <span class="n">on</span><span class="o">=</span><span class="p">[</span><span class="s2">"date"</span><span class="p">,</span> <span class="s2">"Parent_Group"</span><span class="p">],</span> <span class="n">how</span><span class="o">=</span><span class="s2">"inner"</span>
-<span class="p">)</span>
+<span class="c1"># Merge test data with reconciled forecasts </span>
+<span class="n">evaluation_sdf</span> <span class="o">=</span> <span class="n">test_sdf</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+    <span class="n">reconciled_forecast_sdf</span><span class="p">,(</span><span class="n">test_sdf</span><span class="p">[</span><span class="s2">"date"</span><span class="p">]</span> <span class="o">==</span> <span class="n">reconciled_forecast_sdf</span><span class="p">[</span><span class="s2">"date"</span><span class="p">])</span> <span class="o">&amp;</span>
+    <span class="p">(</span><span class="n">test_sdf</span><span class="p">[</span><span class="s2">"Region_Category"</span><span class="p">]</span> <span class="o">==</span> <span class="n">reconciled_forecast_sdf</span><span class="p">[</span><span class="s2">"Parent_Group"</span><span class="p">]),</span> <span class="n">how</span><span class="o">=</span><span class="s2">"inner"</span><span class="p">)</span>
 
 <span class="n">evaluation_sdf</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
@@ -8802,30 +8833,30 @@ only showing top 20 rows
 <div class="jp-OutputArea-child">
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>+----------+------------+------------------+-------------------+
-|      date|Parent_Group|   Actual_Visitors|Reconciled_Forecast|
-+----------+------------+------------------+-------------------+
-|2015-12-01|      DBBHol|24982.024449599998|  93.30359324977445|
-|2015-12-01|      BEDBus|24982.024449599998|  9.587146785063556|
-|2015-12-01|      BEAHol|24982.024449599998|  5.495956927738096|
-|2015-12-01|      ADBBus|24982.024449599998|  33.48580576600097|
-|2015-12-01|      ADBHol|24982.024449599998|  67.11613382657367|
-|2015-12-01|       FCVis|24982.024449599998|  49.72621582615672|
-|2015-12-01|       EABus|24982.024449599998|  337.9295021569872|
-|2015-12-01|       ACBus|24982.024449599998|  72.84836998814711|
-|2015-12-01|      GACAll|24982.024449599998| 25.191637997601127|
-|2016-01-01|      DCBHol|45625.487797300026|  122.5716884443587|
-|2016-01-01|      BBAHol|45625.487797300026| 1215.3210703251198|
-|2016-01-01|      AFAHol|45625.487797300026| 231.28278439478635|
-|2016-01-01|      ABAVis|45625.487797300026|  444.3775568094911|
-|2016-01-01|      ABAHol|45625.487797300026|  738.9134710470801|
-|2016-01-01|       GAVis|45625.487797300026|   93.9877077354365|
-|2016-01-01|       BEHol|45625.487797300026|  499.4794722311132|
-|2016-01-01|       AABus|45625.487797300026| 324.74260821819576|
-|2016-01-01|      DABAll|45625.487797300026|  53.60525695425169|
-|2016-01-01|        GAll|45625.487797300026| 360.19255578422724|
-|2016-02-01|      GAABus|23227.928308800005|  84.29362260554478|
-+----------+------------+------------------+-------------------+
+<pre>+----------+---------------+------------------+----------+------------+-------------------+
+|      date|Region_Category|          Visitors|      date|Parent_Group|Reconciled_Forecast|
++----------+---------------+------------------+----------+------------+-------------------+
+|2015-12-01|         DBBHol|        56.4715996|2015-12-01|      DBBHol|  93.30359324977445|
+|2015-12-01|         BEDBus|        26.0593376|2015-12-01|      BEDBus|  9.587146785063556|
+|2015-12-01|         BEAHol|         4.9512658|2015-12-01|      BEAHol|  5.495956927738096|
+|2015-12-01|         ADBBus|        29.4251674|2015-12-01|      ADBBus|  33.48580576600097|
+|2015-12-01|         ADBHol|         73.630362|2015-12-01|      ADBHol|  67.11613382657367|
+|2015-12-01|          FCVis|       137.4054089|2015-12-01|       FCVis|  49.72621582615672|
+|2015-12-01|          EABus|       814.1032952|2015-12-01|       EABus|  337.9295021569872|
+|2015-12-01|          ACBus|         45.792666|2015-12-01|       ACBus|  72.84836998814711|
+|2015-12-01|         GACAll|        20.8285636|2015-12-01|      GACAll| 25.191637997601127|
+|2016-01-01|         DCBHol|       102.8895483|2016-01-01|      DCBHol|  122.5716884443587|
+|2016-01-01|         BBAHol|       1022.153257|2016-01-01|      BBAHol| 1215.3210703251198|
+|2016-01-01|         AFAHol|       207.9422174|2016-01-01|      AFAHol| 231.28278439478635|
+|2016-01-01|         ABAVis|       354.3176582|2016-01-01|      ABAVis|  444.3775568094911|
+|2016-01-01|         ABAHol|       657.0045098|2016-01-01|      ABAHol|  738.9134710470801|
+|2016-01-01|          GAVis|161.90854199999998|2016-01-01|       GAVis|   93.9877077354365|
+|2016-01-01|          BEHol|       561.7473459|2016-01-01|       BEHol|  499.4794722311132|
+|2016-01-01|          AABus|       248.5930062|2016-01-01|       AABus| 324.74260821819576|
+|2016-01-01|         DABAll|26.582756099999997|2016-01-01|      DABAll|  53.60525695425169|
+|2016-01-01|           GAll|       608.4583232|2016-01-01|        GAll| 360.19255578422724|
+|2016-02-01|         GAABus|       204.0029381|2016-02-01|      GAABus|  84.29362260554478|
++----------+---------------+------------------+----------+------------+-------------------+
 only showing top 20 rows
 
 </pre>
@@ -8844,14 +8875,14 @@ only showing top 20 rows
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [23]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In [13]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
 <div class="highlight hl-ipython3"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">pyspark.sql.functions</span><span class="w"> </span><span class="kn">import</span> <span class="nb">abs</span><span class="p">,</span> <span class="n">mean</span>
 
 <span class="c1"># Compute Absolute Percentage Error (APE)</span>
 <span class="n">evaluation_sdf</span> <span class="o">=</span> <span class="n">evaluation_sdf</span><span class="o">.</span><span class="n">withColumn</span><span class="p">(</span>
-    <span class="s2">"APE"</span><span class="p">,</span> <span class="nb">abs</span><span class="p">((</span><span class="n">col</span><span class="p">(</span><span class="s2">"Reconciled_Forecast"</span><span class="p">)</span> <span class="o">-</span> <span class="n">col</span><span class="p">(</span><span class="s2">"Actual_Visitors"</span><span class="p">))</span> <span class="o">/</span> <span class="n">col</span><span class="p">(</span><span class="s2">"Actual_Visitors"</span><span class="p">))</span>
+    <span class="s2">"APE"</span><span class="p">,</span> <span class="nb">abs</span><span class="p">((</span><span class="n">col</span><span class="p">(</span><span class="s2">"Reconciled_Forecast"</span><span class="p">)</span> <span class="o">-</span> <span class="n">col</span><span class="p">(</span><span class="s2">"Visitors"</span><span class="p">))</span> <span class="o">/</span> <span class="n">col</span><span class="p">(</span><span class="s2">"Visitors"</span><span class="p">))</span>
 <span class="p">)</span>
 
 <span class="c1"># Compute MAPE for each Parent_Group</span>
@@ -8894,30 +8925,30 @@ only showing top 20 rows
 <div class="jp-OutputArea-child">
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>+------------+------------------+
-|Parent_Group|              MAPE|
-+------------+------------------+
-|      CBDAll|0.9918551321816805|
-|       BCHol|0.9857934130236617|
-|      BCBOth|0.9998273964952409|
-|      DDBHol|0.9965713950479036|
-|      CCBAll|0.9872982701563636|
-|       CCOth|0.9971415937249763|
-|      DCCAll|0.9987860340371489|
-|      BDEAll|0.9986953765843504|
-|      FBAVis|0.9996472874910226|
-|      EABVis|0.9849344998635591|
-|      GABVis|0.9997748506792165|
-|      ADBAll|0.9903498750139902|
-|      FAAHol|0.9929209612350367|
-|      BDFAll|0.9989229459704517|
-|      CBCHol| 0.996186434565634|
-|      GBCAll|0.9974573023722869|
-|      CDBHol| 0.998463935084155|
-|      BEGAll|0.9955394793307324|
-|       DABus|0.9938826685744151|
-|      DAAVis|0.9899752829805119|
-+------------+------------------+
+<pre>+------------+-------------------+
+|Parent_Group|               MAPE|
++------------+-------------------+
+|      CBDAll| 0.2550932378516649|
+|       BCHol| 0.2331579095430285|
+|      BCBOth| 1.6313505417732714|
+|      DDBHol| 0.4864743268589713|
+|      CCBAll|0.13678302058110534|
+|       CCOth| 1.0880149903621297|
+|      DCCAll| 0.7157011187993264|
+|      BDEAll| 0.4628142786126928|
+|      FBAVis| 1.1987426872820532|
+|      EABVis|0.20529851654215325|
+|      GABVis|0.45942041750965984|
+|      ADBAll|0.22358035008124189|
+|      FAAHol|0.22072859753473617|
+|      BDFAll|0.34624093728546307|
+|      CBCHol|0.47280752400465315|
+|      GBCAll|0.34792212889807633|
+|      CDBHol| 0.5442149734203975|
+|      BEGAll| 0.5032406466166397|
+|       DABus|  0.373888381661309|
+|      DAAVis|0.09960136963713516|
++------------+-------------------+
 only showing top 20 rows
 
 </pre>
@@ -8943,7 +8974,7 @@ only showing top 20 rows
 <pre>+------------------+
 |      Overall_MAPE|
 +------------------+
-|0.9860567355464035|
+|0.8834639524375625|
 +------------------+
 
 </pre>
@@ -8954,6 +8985,20 @@ only showing top 20 rows
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="application/vnd.jupyter.stderr" tabindex="0">
 <pre>                                                                                </pre>
 </div>
+</div>
+</div>
+</div>
+</div></section></section><section><section>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<h2 id="Further-reading">Further reading<a class="anchor-link" href="#Further-reading">¶</a></h2><ul>
+<li>Forecasting hierarchical and grouped time series <a href="https://otexts.com/fpp3/hierarchical.html">https://otexts.com/fpp3/hierarchical.html</a></li>
+<li>Athanasopoulos, G., Ahmed, R. A., &amp; Hyndman, R. J. (2009). Hierarchical forecasts for Australian domestic tourism. International Journal of Forecasting, 25, 146–166. <a href="https://doi.org/10.1016/j.ijforecast.2008.07.004">https://doi.org/10.1016/j.ijforecast.2008.07.004</a></li>
+</ul>
 </div>
 </div>
 </div>
