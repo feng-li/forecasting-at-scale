@@ -10,7 +10,7 @@ zipgit:
 	git archive --output=bdcf-slides_data.zip HEAD
 
 zipcode:
-	zip -r bdcf-slides.zip . -x "*.git*" "data/*" ".venv/*"
+	zip -r bdcf-slides.zip S* README.md requirements.txt setup.py setup_spark.sh -x "*/.ipynb_checkpoints/*"
 
 sync:
 	rsync -av --delete-excluded --prune-empty-dirs --include '*/' --include '*slides.zip' --include 'data/*' --include '*.ipynb' --include '*.slides.html' --include 'figures/*' --exclude '*' .  ${HOME}/nextcloud/feng.li/bdcf/
