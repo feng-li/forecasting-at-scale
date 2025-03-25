@@ -5,7 +5,7 @@
 <meta content="chrome=1" http-equiv="X-UA-Compatible"/>
 <meta content="yes" name="apple-mobile-web-app-capable"/>
 <meta content="black-translucent" name="apple-mobile-web-app-status-bar-style"/>
-<title>L01-Hierarchical-Time-Series-Forecasting slides</title><script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.1.10/require.min.js"></script><script type="module">
+<title>L02-OLS-Reconciliation-with-Spark slides</title><script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.1.10/require.min.js"></script><script type="module">
   import mermaid from 'https://cdnjs.cloudflare.com/ajax/libs/mermaid/10.7.0/mermaid.esm.min.mjs';
   mermaid.initialize({ startOnLoad: true });
 </script>
@@ -7441,7 +7441,324 @@ main {
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h1 id="Forecasting-hierarchical-or-grouped-time-series">Forecasting hierarchical or grouped time series<a class="anchor-link" href="#Forecasting-hierarchical-or-grouped-time-series">¶</a></h1><h2 id="Feng-Li">Feng Li<a class="anchor-link" href="#Feng-Li">¶</a></h2><h3 id="Guanghua-School-of-Management">Guanghua School of Management<a class="anchor-link" href="#Guanghua-School-of-Management">¶</a></h3><h3 id="Peking-University">Peking University<a class="anchor-link" href="#Peking-University">¶</a></h3><h3 id="feng.li@gsm.pku.edu.cn"><a href="feng.li@gsm.pku.edu.cn">feng.li@gsm.pku.edu.cn</a><a class="anchor-link" href="#feng.li@gsm.pku.edu.cn">¶</a></h3><h3 id="Course-home-page:-https://feng.li/bdcf">Course home page: <a href="https://feng.li/bdcf">https://feng.li/bdcf</a><a class="anchor-link" href="#Course-home-page:-https://feng.li/bdcf">¶</a></h3>
+<h1 id="OLS-Reconciliation-with-Spark">OLS Reconciliation with Spark<a class="anchor-link" href="#OLS-Reconciliation-with-Spark">¶</a></h1><h2 id="Feng-Li">Feng Li<a class="anchor-link" href="#Feng-Li">¶</a></h2><h3 id="Guanghua-School-of-Management">Guanghua School of Management<a class="anchor-link" href="#Guanghua-School-of-Management">¶</a></h3><h3 id="Peking-University">Peking University<a class="anchor-link" href="#Peking-University">¶</a></h3><h3 id="feng.li@gsm.pku.edu.cn"><a href="feng.li@gsm.pku.edu.cn">feng.li@gsm.pku.edu.cn</a><a class="anchor-link" href="#feng.li@gsm.pku.edu.cn">¶</a></h3><h3 id="Course-home-page:-https://feng.li/bdcf">Course home page: <a href="https://feng.li/bdcf">https://feng.li/bdcf</a><a class="anchor-link" href="#Course-home-page:-https://feng.li/bdcf">¶</a></h3>
+</div>
+</div>
+</div>
+</div></section></section><section><section><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [1]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="cm-editor cm-s-jupyter">
+<div class="highlight hl-ipython3"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">os</span><span class="o">,</span><span class="w"> </span><span class="nn">sys</span> <span class="c1"># Ensure All environment variables are properly set </span>
+<span class="c1"># os.environ["JAVA_HOME"] = os.path.dirname(sys.executable)</span>
+<span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">"PYSPARK_PYTHON"</span><span class="p">]</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">executable</span>
+<span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">"PYSPARK_DRIVER_PYTHON"</span><span class="p">]</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">executable</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">pyspark.sql</span><span class="w"> </span><span class="kn">import</span> <span class="n">SparkSession</span> <span class="c1"># build Spark Session</span>
+<span class="n">spark</span> <span class="o">=</span> <span class="n">SparkSession</span><span class="o">.</span><span class="n">builder</span> \
+    <span class="o">.</span><span class="n">config</span><span class="p">(</span><span class="s2">"spark.ui.enabled"</span><span class="p">,</span> <span class="s2">"false"</span><span class="p">)</span> \
+    <span class="o">.</span><span class="n">config</span><span class="p">(</span><span class="s2">"spark.executor.memory"</span><span class="p">,</span> <span class="s2">"16g"</span><span class="p">)</span> \
+    <span class="o">.</span><span class="n">config</span><span class="p">(</span><span class="s2">"spark.executor.cores"</span><span class="p">,</span> <span class="s2">"4"</span><span class="p">)</span> \
+    <span class="o">.</span><span class="n">config</span><span class="p">(</span><span class="s2">"spark.cores.max"</span><span class="p">,</span> <span class="s2">"32"</span><span class="p">)</span> \
+    <span class="o">.</span><span class="n">config</span><span class="p">(</span><span class="s2">"spark.driver.memory"</span><span class="p">,</span> <span class="s2">"30g"</span><span class="p">)</span> \
+    <span class="o">.</span><span class="n">config</span><span class="p">(</span><span class="s2">"spark.sql.shuffle.partitions"</span><span class="p">,</span> <span class="s2">"96"</span><span class="p">)</span> \
+    <span class="o">.</span><span class="n">config</span><span class="p">(</span><span class="s2">"spark.memory.fraction"</span><span class="p">,</span> <span class="s2">"0.8"</span><span class="p">)</span> \
+    <span class="o">.</span><span class="n">config</span><span class="p">(</span><span class="s2">"spark.memory.storageFraction"</span><span class="p">,</span> <span class="s2">"0.5"</span><span class="p">)</span> \
+    <span class="o">.</span><span class="n">config</span><span class="p">(</span><span class="s2">"spark.dynamicAllocation.enabled"</span><span class="p">,</span> <span class="s2">"true"</span><span class="p">)</span> \
+    <span class="o">.</span><span class="n">config</span><span class="p">(</span><span class="s2">"spark.dynamicAllocation.minExecutors"</span><span class="p">,</span> <span class="s2">"4"</span><span class="p">)</span> \
+    <span class="o">.</span><span class="n">config</span><span class="p">(</span><span class="s2">"spark.dynamicAllocation.maxExecutors"</span><span class="p">,</span> <span class="s2">"8"</span><span class="p">)</span> \
+    <span class="o">.</span><span class="n">appName</span><span class="p">(</span><span class="s2">"Spark Forecasting"</span><span class="p">)</span><span class="o">.</span><span class="n">getOrCreate</span><span class="p">()</span>
+<span class="n">spark</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell-outputWrapper">
+<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
+</div>
+<div class="jp-OutputArea jp-Cell-outputArea">
+<div class="jp-OutputArea-child">
+<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="application/vnd.jupyter.stderr" tabindex="0">
+<pre>Setting default log level to "WARN".
+To adjust logging level use sc.setLogLevel(newLevel). For SparkR, use setLogLevel(newLevel).
+25/03/25 14:23:43 WARN NativeCodeLoader: Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+</pre>
+</div>
+</div>
+<div class="jp-OutputArea-child jp-OutputArea-executeResult">
+<div class="jp-OutputPrompt jp-OutputArea-prompt">Out[1]:</div>
+<div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/html" tabindex="0">
+<div>
+<p><b>SparkSession - in-memory</b></p>
+<div>
+<p><b>SparkContext</b></p>
+<p><a href="None">Spark UI</a></p>
+<dl>
+<dt>Version</dt>
+<dd><code>v3.5.3</code></dd>
+<dt>Master</dt>
+<dd><code>local[*]</code></dd>
+<dt>AppName</dt>
+<dd><code>Spark Forecasting</code></dd>
+</dl>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div></section></section><section><section><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [5]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="cm-editor cm-s-jupyter">
+<div class="highlight hl-ipython3"><pre><span></span><span class="n">train_sdf</span> <span class="o">=</span> <span class="n">spark</span><span class="o">.</span><span class="n">read</span><span class="o">.</span><span class="n">csv</span><span class="p">(</span><span class="s2">"../data/tourism/tourism_train.csv"</span><span class="p">,</span> <span class="n">header</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">inferSchema</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">test_sdf</span> <span class="o">=</span> <span class="n">spark</span><span class="o">.</span><span class="n">read</span><span class="o">.</span><span class="n">csv</span><span class="p">(</span><span class="s2">"../data/tourism/tourism_test.csv"</span><span class="p">,</span> <span class="n">header</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">inferSchema</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">forecast_sdf</span> <span class="o">=</span> <span class="n">spark</span><span class="o">.</span><span class="n">read</span><span class="o">.</span><span class="n">csv</span><span class="p">(</span><span class="s2">"../data/tourism/ets_forecasts.csv"</span><span class="p">,</span> <span class="n">header</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">inferSchema</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+</div></section></section><section><section><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [3]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="cm-editor cm-s-jupyter">
+<div class="highlight hl-ipython3"><pre><span></span><span class="n">train_sdf</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell-outputWrapper">
+<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
+</div>
+<div class="jp-OutputArea jp-Cell-outputArea">
+<div class="jp-OutputArea-child">
+<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
+<pre>+----------+---------------+------------------+
+|      date|Region_Category|          Visitors|
++----------+---------------+------------------+
+|1998-01-01|       TotalAll|45151.071280099975|
+|1998-01-01|           AAll|17515.502379600006|
+|1998-01-01|           BAll|10393.618015699998|
+|1998-01-01|           CAll| 8633.359046599999|
+|1998-01-01|           DAll|3504.3133462000005|
+|1998-01-01|           EAll|      3121.6191894|
+|1998-01-01|           FAll|1850.7357734999998|
+|1998-01-01|           GAll|131.92352909999997|
+|1998-01-01|          AAAll|      4977.2096105|
+|1998-01-01|          ABAll| 5322.738721600001|
+|1998-01-01|          ACAll|3569.6213724000004|
+|1998-01-01|          ADAll|      1472.9706096|
+|1998-01-01|          AEAll|      1560.5142545|
+|1998-01-01|          AFAll|        612.447811|
+|1998-01-01|          BAAll|       3854.672582|
+|1998-01-01|          BBAll|1653.9957826000002|
+|1998-01-01|          BCAll|      2138.7473162|
+|1998-01-01|          BDAll|      1395.3775834|
+|1998-01-01|          BEAll|1350.8247515000003|
+|1998-01-01|          CAAll| 6421.236419000001|
++----------+---------------+------------------+
+only showing top 20 rows
+
+</pre>
+</div>
+</div>
+</div>
+</div>
+</div></section></section><section><section><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [7]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="cm-editor cm-s-jupyter">
+<div class="highlight hl-ipython3"><pre><span></span><span class="n">test_sdf</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell-outputWrapper">
+<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
+</div>
+<div class="jp-OutputArea jp-Cell-outputArea">
+<div class="jp-OutputArea-child">
+<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
+<pre>+----------+---------------+------------------+
+|      date|Region_Category|          Visitors|
++----------+---------------+------------------+
+|2015-12-01|       TotalAll|24982.024449599998|
+|2015-12-01|           AAll|      7166.1237555|
+|2015-12-01|           BAll|      5340.1512778|
+|2015-12-01|           CAll| 5621.323498100002|
+|2015-12-01|           DAll|1871.7627924999997|
+|2015-12-01|           EAll|      3662.9183909|
+|2015-12-01|           FAll| 903.1237441000002|
+|2015-12-01|           GAll|416.62099070000016|
+|2015-12-01|          AAAll|2107.3938028000007|
+|2015-12-01|          ABAll|      2084.6943991|
+|2015-12-01|          ACAll|       829.2701471|
+|2015-12-01|          ADAll| 838.6748597999999|
+|2015-12-01|          AEAll|       760.0565663|
+|2015-12-01|          AFAll|       546.0339804|
+|2015-12-01|          BAAll|2659.1528845999997|
+|2015-12-01|          BBAll|       645.4208704|
+|2015-12-01|          BCAll|       576.0730749|
+|2015-12-01|          BDAll| 768.1817073999999|
+|2015-12-01|          BEAll|       691.3227405|
+|2015-12-01|          CAAll|3101.1905463999997|
++----------+---------------+------------------+
+only showing top 20 rows
+
+</pre>
+</div>
+</div>
+</div>
+</div>
+</div></section></section><section><section><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [6]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="cm-editor cm-s-jupyter">
+<div class="highlight hl-ipython3"><pre><span></span><span class="n">forecast_sdf</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell-outputWrapper">
+<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
+</div>
+<div class="jp-OutputArea jp-Cell-outputArea">
+<div class="jp-OutputArea-child">
+<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
+<pre>+----------+---------------+------------------+
+|      date|Region_Category|          Forecast|
++----------+---------------+------------------+
+|2015-12-01|         AAAAll| 2058.838101212888|
+|2016-01-01|         AAAAll|3162.9085270260384|
+|2016-02-01|         AAAAll|1744.1909768938476|
+|2016-03-01|         AAAAll|2059.3010229302345|
+|2016-04-01|         AAAAll|  2060.36170915585|
+|2016-05-01|         AAAAll| 1972.482680954841|
+|2016-06-01|         AAAAll| 1846.108381522378|
+|2016-07-01|         AAAAll| 2151.959971338432|
+|2016-08-01|         AAAAll| 1872.768734964083|
+|2016-09-01|         AAAAll|2014.0112033543805|
+|2016-10-01|         AAAAll|2296.4055573391643|
+|2016-11-01|         AAAAll| 2043.693618904705|
+|2015-12-01|         AAABus|455.55263433165527|
+|2016-01-01|         AAABus| 296.1898590727801|
+|2016-02-01|         AAABus| 453.3714726155002|
+|2016-03-01|         AAABus|  525.339287022726|
+|2016-04-01|         AAABus| 459.2040763240983|
+|2016-05-01|         AAABus| 554.7602408402748|
+|2016-06-01|         AAABus| 498.8249232185846|
+|2016-07-01|         AAABus| 604.1654402560752|
++----------+---------------+------------------+
+only showing top 20 rows
+
+</pre>
+</div>
+</div>
+</div>
+</div>
+</div></section></section><section><section><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [10]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="cm-editor cm-s-jupyter">
+<div class="highlight hl-ipython3"><pre><span></span><span class="o">%%</span><span class="k">script</span> echo skipping
+
+# If you want to have alternative forecasts, change the following code to obtain `forecast_sdf`
+
+from pyspark.sql.functions import explode, col
+from pyspark.sql.types import StructType, StructField, StringType, ArrayType, DoubleType, DateType
+import pandas as pd
+from pandas.tseries.offsets import MonthBegin
+from statsmodels.tsa.holtwinters import ExponentialSmoothing
+
+# Define schema for the forecast output
+forecast_schema = StructType([
+    StructField("date", DateType(), False),
+    StructField("Region_Category", StringType(), False),
+    StructField("Forecast", DoubleType(), False)
+])
+
+
+def ets_forecast(pdf):
+    """Fits an ETS model for a single region and forecasts 12 months ahead."""
+    region = pdf["Region_Category"].iloc[0]  # Extract region name
+    pdf = pdf.sort_values("date")  # Ensure time series is sorted
+
+    try:
+        # Drop missing values
+        ts = pdf["Visitors"].dropna()
+
+        if len(ts) &gt;= 24:  # Ensure at least 24 observations
+            model = ExponentialSmoothing(ts, trend="add", seasonal="add", seasonal_periods=12)
+            fitted_model = model.fit()
+            forecast = fitted_model.forecast(steps=12)
+        else:
+            forecast = [None] * 12  # Not enough data
+    except:
+        forecast = [None] * 12  # Handle errors
+
+    # Adjust forecast dates to start of the month
+    last_date = pdf["date"].max()
+    future_dates = pd.date_range(start=last_date, periods=12, freq="ME") + MonthBegin(1)
+
+    # Return results as a DataFrame
+    return pd.DataFrame({"date": future_dates, "Region_Category": region, "Forecast": forecast})
+
+# Apply the ETS model in parallel using applyInPandas
+forecast_sdf = train_sdf.groupBy("Region_Category").applyInPandas(ets_forecast, schema=forecast_schema)
+
+# Show forecasted results
+forecast_sdf.show()
+
+# Save forecasts if needed
+forecast_sdf.write.csv(os.path.expanduser("~/ets_forecasts.csv"), header=True, mode="overwrite")
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell-outputWrapper">
+<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
+</div>
+<div class="jp-OutputArea jp-Cell-outputArea">
+<div class="jp-OutputArea-child">
+<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
+<pre>skipping
+</pre>
+</div>
 </div>
 </div>
 </div>
@@ -7452,18 +7769,320 @@ main {
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<h2 id="MinT-OLS-approximation">MinT-OLS approximation<a class="anchor-link" href="#MinT-OLS-approximation">¶</a></h2><p>Since PySpark doesn't support matrix operations like NumPy, we'll use the <strong>MinT-OLS approximation</strong>, which assumes the forecast error covariance matrix ( W = I ) (identity matrix). This simplifies the formula:</p>
+<p>$$
+\tilde{y} = S (S^\top S)^{-1} S^\top \hat{y}
+$$</p>
 <ul>
-<li><p>We discuss forecasting large collections of time series that must add up in some way.</p>
-</li>
-<li><p>The challenge is that we require forecasts that are <strong>coherent</strong> across the aggregation structure.</p>
-<pre><code>  That is, we require forecasts to add up in a manner that is consistent with the aggregation structure of the collection of time series. </code></pre>
-</li>
-<li><p>We discuss several methods for producing coherent forecasts for both hierarchical and grouped time series.</p>
+<li><code>forecast_sdf</code> contains <strong>base forecasts</strong> for each <code>Region_Category</code> and <code>date</code>.</li>
+<li><code>test_sdf</code> is your <strong>test set</strong> with actual <code>Visitors</code> by <code>Region_Category</code> and <code>date</code>.</li>
+<li>You have <code>summing_sdf_long</code> with:<ul>
+<li><code>Parent_Group</code></li>
+<li><code>Region_Category</code></li>
+<li><code>Weight</code> (usually 0 or 1)</li>
+</ul>
 </li>
 </ul>
 </div>
 </div>
 </div>
+</div></section></section><section><section><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [11]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="cm-editor cm-s-jupyter">
+<div class="highlight hl-ipython3"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">pyspark.sql.functions</span><span class="w"> </span><span class="kn">import</span> <span class="n">col</span><span class="p">,</span> <span class="nb">sum</span> <span class="k">as</span> <span class="n">spark_sum</span>
+
+
+<span class="c1"># Load the summing matrix file</span>
+<span class="n">summing_matrix_path</span> <span class="o">=</span> <span class="s2">"../data/tourism/agg_mat.csv"</span>  <span class="c1"># Update with actual path</span>
+
+<span class="c1"># Load the summing matrix file (skip the first column)</span>
+<span class="n">summing_sdf</span> <span class="o">=</span> <span class="n">spark</span><span class="o">.</span><span class="n">read</span><span class="o">.</span><span class="n">csv</span><span class="p">(</span><span class="n">summing_matrix_path</span><span class="p">,</span> <span class="n">header</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">inferSchema</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+
+<span class="c1"># Convert from wide format to long format (Region_Category, Parent_Group, Weight)</span>
+<span class="n">summing_sdf_long</span> <span class="o">=</span> <span class="n">summing_sdf</span><span class="o">.</span><span class="n">selectExpr</span><span class="p">(</span>
+    <span class="s2">"Parent_Group"</span><span class="p">,</span>
+    <span class="s2">"stack("</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">summing_sdf</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="s2">", "</span> <span class="o">+</span>
+    <span class="s2">", "</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="sa">f</span><span class="s2">"'</span><span class="si">{</span><span class="n">col</span><span class="si">}</span><span class="s2">', </span><span class="si">{</span><span class="n">col</span><span class="si">}</span><span class="s2">"</span> <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">summing_sdf</span><span class="o">.</span><span class="n">columns</span> <span class="k">if</span> <span class="n">col</span> <span class="o">!=</span> <span class="s2">"Parent_Group"</span><span class="p">])</span> <span class="o">+</span>
+    <span class="s2">") as (Region_Category, Weight)"</span>
+<span class="p">)</span>
+
+<span class="c1"># Show the reshaped summing matrix</span>
+<span class="n">summing_sdf_long</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell-outputWrapper">
+<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
+</div>
+<div class="jp-OutputArea jp-Cell-outputArea">
+<div class="jp-OutputArea-child">
+<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="application/vnd.jupyter.stderr" tabindex="0">
+<pre>25/03/25 14:59:17 WARN SparkStringUtils: Truncated the string representation of a plan since it was too large. This behavior can be adjusted by setting 'spark.sql.debug.maxToStringFields'.
+</pre>
+</div>
+</div>
+<div class="jp-OutputArea-child">
+<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
+<pre>+------------+---------------+------+
+|Parent_Group|Region_Category|Weight|
++------------+---------------+------+
+|    TotalAll|         AAAHol|   1.0|
+|    TotalAll|         AAAVis|   1.0|
+|    TotalAll|         AAABus|   1.0|
+|    TotalAll|         AAAOth|   1.0|
+|    TotalAll|         AABHol|   1.0|
+|    TotalAll|         AABVis|   1.0|
+|    TotalAll|         AABBus|   1.0|
+|    TotalAll|         AABOth|   1.0|
+|    TotalAll|         ABAHol|   1.0|
+|    TotalAll|         ABAVis|   1.0|
+|    TotalAll|         ABABus|   1.0|
+|    TotalAll|         ABAOth|   1.0|
+|    TotalAll|         ABBHol|   1.0|
+|    TotalAll|         ABBVis|   1.0|
+|    TotalAll|         ABBBus|   1.0|
+|    TotalAll|         ABBOth|   1.0|
+|    TotalAll|         ACAHol|   1.0|
+|    TotalAll|         ACAVis|   1.0|
+|    TotalAll|         ACABus|   1.0|
+|    TotalAll|         ACAOth|   1.0|
++------------+---------------+------+
+only showing top 20 rows
+
+</pre>
+</div>
+</div>
+</div>
+</div>
+</div></section></section><section><section><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [13]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="cm-editor cm-s-jupyter">
+<div class="highlight hl-ipython3"><pre><span></span><span class="n">mint_input_sdf</span> <span class="o">=</span> <span class="n">forecast_sdf</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">summing_sdf_long</span><span class="p">,</span> <span class="n">on</span><span class="o">=</span><span class="s2">"Region_Category"</span><span class="p">,</span> <span class="n">how</span><span class="o">=</span><span class="s2">"inner"</span><span class="p">)</span>
+
+<span class="c1"># Multiply base forecast by structure weights</span>
+<span class="n">mint_input_sdf</span> <span class="o">=</span> <span class="n">mint_input_sdf</span><span class="o">.</span><span class="n">withColumn</span><span class="p">(</span><span class="s2">"Weighted_Forecast"</span><span class="p">,</span> <span class="n">col</span><span class="p">(</span><span class="s2">"Forecast"</span><span class="p">)</span> <span class="o">*</span> <span class="n">col</span><span class="p">(</span><span class="s2">"Weight"</span><span class="p">))</span>
+
+<span class="c1"># Sum up forecasts to each parent group</span>
+<span class="n">mint_reconciled_sdf</span> <span class="o">=</span> <span class="n">mint_input_sdf</span><span class="o">.</span><span class="n">groupBy</span><span class="p">(</span><span class="s2">"date"</span><span class="p">,</span> <span class="s2">"Parent_Group"</span><span class="p">)</span><span class="o">.</span><span class="n">agg</span><span class="p">(</span>
+    <span class="n">spark_sum</span><span class="p">(</span><span class="s2">"Weighted_Forecast"</span><span class="p">)</span><span class="o">.</span><span class="n">alias</span><span class="p">(</span><span class="s2">"Reconciled_Forecast"</span><span class="p">)</span>
+<span class="p">)</span>
+<span class="n">mint_reconciled_sdf</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell-outputWrapper">
+<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
+</div>
+<div class="jp-OutputArea jp-Cell-outputArea">
+<div class="jp-OutputArea-child">
+<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="application/vnd.jupyter.stderr" tabindex="0">
+<pre>/nfs-share/home/2406184221/.local/lib/python3.12/site-packages/statsmodels/tsa/holtwinters/model.py:918: ConvergenceWarning: Optimization failed to converge. Check mle_retvals.
+  warnings.warn(
+/nfs-share/home/2406184221/.local/lib/python3.12/site-packages/statsmodels/tsa/holtwinters/model.py:918: ConvergenceWarning: Optimization failed to converge. Check mle_retvals.
+  warnings.warn(
+/nfs-share/home/2406184221/.local/lib/python3.12/site-packages/statsmodels/tsa/holtwinters/model.py:918: ConvergenceWarning: Optimization failed to converge. Check mle_retvals.
+  warnings.warn(
+/nfs-share/home/2406184221/.local/lib/python3.12/site-packages/statsmodels/tsa/holtwinters/model.py:918: ConvergenceWarning: Optimization failed to converge. Check mle_retvals.
+  warnings.warn(
+</pre>
+</div>
+</div>
+<div class="jp-OutputArea-child">
+<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
+<pre>+----------+------------+-------------------+
+|      date|Parent_Group|Reconciled_Forecast|
++----------+------------+-------------------+
+|2015-12-01|      DBBHol|  93.30359324977445|
+|2015-12-01|      BEDBus|  9.587146785063556|
+|2015-12-01|      BEAHol|  5.495956927738096|
+|2015-12-01|      ADBBus|  33.48580576600097|
+|2015-12-01|      ADBHol|  67.11613382657367|
+|2015-12-01|       FCVis|  49.72621582615672|
+|2015-12-01|       EABus|  337.9295021569872|
+|2015-12-01|       ACBus|  72.84836998814711|
+|2015-12-01|      GACAll| 25.191637997601127|
+|2016-01-01|      DCBHol|  122.5716884443587|
+|2016-01-01|      BBAHol| 1215.3210703251198|
+|2016-01-01|      AFAHol| 231.28278439478635|
+|2016-01-01|      ABAVis|  444.3775568094911|
+|2016-01-01|      ABAHol|  738.9134710470801|
+|2016-01-01|       GAVis|   93.9877077354365|
+|2016-01-01|       BEHol|  499.4794722311132|
+|2016-01-01|       AABus| 324.74260821819576|
+|2016-01-01|      DABAll|  53.60525695425169|
+|2016-01-01|        GAll| 360.19255578422724|
+|2016-02-01|      GAABus|  84.29362260554478|
++----------+------------+-------------------+
+only showing top 20 rows
+
+</pre>
+</div>
+</div>
+<div class="jp-OutputArea-child">
+<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="application/vnd.jupyter.stderr" tabindex="0">
+<pre>                                                                                </pre>
+</div>
+</div>
+</div>
+</div>
+</div></section></section><section><section><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [14]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="cm-editor cm-s-jupyter">
+<div class="highlight hl-ipython3"><pre><span></span><span class="n">test_parent_sdf</span> <span class="o">=</span> <span class="n">test_sdf</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">summing_sdf_long</span><span class="p">,</span> <span class="n">on</span><span class="o">=</span><span class="s2">"Region_Category"</span><span class="p">,</span> <span class="n">how</span><span class="o">=</span><span class="s2">"inner"</span><span class="p">)</span> \
+    <span class="o">.</span><span class="n">groupBy</span><span class="p">(</span><span class="s2">"date"</span><span class="p">,</span> <span class="s2">"Parent_Group"</span><span class="p">)</span> \
+    <span class="o">.</span><span class="n">agg</span><span class="p">(</span><span class="n">spark_sum</span><span class="p">(</span><span class="s2">"Visitors"</span><span class="p">)</span><span class="o">.</span><span class="n">alias</span><span class="p">(</span><span class="s2">"Actual_Visitors"</span><span class="p">))</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">pyspark.sql.functions</span><span class="w"> </span><span class="kn">import</span> <span class="nb">abs</span><span class="p">,</span> <span class="n">mean</span>
+
+<span class="n">evaluation_sdf</span> <span class="o">=</span> <span class="n">mint_reconciled_sdf</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">test_parent_sdf</span><span class="p">,</span> <span class="n">on</span><span class="o">=</span><span class="p">[</span><span class="s2">"date"</span><span class="p">,</span> <span class="s2">"Parent_Group"</span><span class="p">],</span> <span class="n">how</span><span class="o">=</span><span class="s2">"inner"</span><span class="p">)</span> \
+    <span class="o">.</span><span class="n">withColumn</span><span class="p">(</span><span class="s2">"APE"</span><span class="p">,</span> <span class="nb">abs</span><span class="p">((</span><span class="n">col</span><span class="p">(</span><span class="s2">"Reconciled_Forecast"</span><span class="p">)</span> <span class="o">-</span> <span class="n">col</span><span class="p">(</span><span class="s2">"Actual_Visitors"</span><span class="p">))</span> <span class="o">/</span> <span class="n">col</span><span class="p">(</span><span class="s2">"Actual_Visitors"</span><span class="p">)))</span>
+
+<span class="n">mape_sdf</span> <span class="o">=</span> <span class="n">evaluation_sdf</span><span class="o">.</span><span class="n">groupBy</span><span class="p">(</span><span class="s2">"Parent_Group"</span><span class="p">)</span><span class="o">.</span><span class="n">agg</span><span class="p">(</span><span class="n">mean</span><span class="p">(</span><span class="s2">"APE"</span><span class="p">)</span><span class="o">.</span><span class="n">alias</span><span class="p">(</span><span class="s2">"MAPE"</span><span class="p">))</span>
+<span class="n">mape_sdf</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell-outputWrapper">
+<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
+</div>
+<div class="jp-OutputArea jp-Cell-outputArea">
+<div class="jp-OutputArea-child">
+<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="application/vnd.jupyter.stderr" tabindex="0">
+<pre>/nfs-share/home/2406184221/.local/lib/python3.12/site-packages/statsmodels/tsa/holtwinters/model.py:918: ConvergenceWarning: Optimization failed to converge. Check mle_retvals.
+  warnings.warn(
+/nfs-share/home/2406184221/.local/lib/python3.12/site-packages/statsmodels/tsa/holtwinters/model.py:918: ConvergenceWarning: Optimization failed to converge. Check mle_retvals.
+  warnings.warn(
+/nfs-share/home/2406184221/.local/lib/python3.12/site-packages/statsmodels/tsa/holtwinters/model.py:918: ConvergenceWarning: Optimization failed to converge. Check mle_retvals.
+  warnings.warn(
+/nfs-share/home/2406184221/.local/lib/python3.12/site-packages/statsmodels/tsa/holtwinters/model.py:918: ConvergenceWarning: Optimization failed to converge. Check mle_retvals.
+  warnings.warn(
+</pre>
+</div>
+</div>
+<div class="jp-OutputArea-child">
+<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
+<pre>+------------+------------------+
+|Parent_Group|              MAPE|
++------------+------------------+
+|      CBDAll|0.9918551321816805|
+|       BCHol|0.9857934130236617|
+|      BCBOth|0.9998273964952409|
+|      DDBHol|0.9965713950479036|
+|      CCBAll|0.9872982701563636|
+|       CCOth|0.9971415937249763|
+|      DCCAll|0.9987860340371489|
+|      BDEAll|0.9986953765843504|
+|      FBAVis|0.9996472874910226|
+|      EABVis|0.9849344998635591|
+|      GABVis|0.9997748506792165|
+|      ADBAll|0.9903498750139902|
+|      FAAHol|0.9929209612350367|
+|      BDFAll|0.9989229459704517|
+|      CBCHol| 0.996186434565634|
+|      GBCAll|0.9974573023722869|
+|      CDBHol| 0.998463935084155|
+|      BEGAll|0.9955394793307324|
+|       DABus|0.9938826685744151|
+|      DAAVis|0.9899752829805119|
++------------+------------------+
+only showing top 20 rows
+
+</pre>
+</div>
+</div>
+<div class="jp-OutputArea-child">
+<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="application/vnd.jupyter.stderr" tabindex="0">
+<pre>                                                                                </pre>
+</div>
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [15]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="cm-editor cm-s-jupyter">
+<div class="highlight hl-ipython3"><pre><span></span><span class="c1"># Compute overall mean MAPE across all Region_Category</span>
+<span class="n">overall_mape_ols</span> <span class="o">=</span> <span class="n">mape_sdf</span><span class="o">.</span><span class="n">agg</span><span class="p">(</span><span class="n">mean</span><span class="p">(</span><span class="s2">"MAPE"</span><span class="p">)</span><span class="o">.</span><span class="n">alias</span><span class="p">(</span><span class="s2">"Overall_MAPE"</span><span class="p">))</span>
+
+<span class="c1"># Show the result</span>
+<span class="n">overall_mape_ols</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell-outputWrapper">
+<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
+</div>
+<div class="jp-OutputArea jp-Cell-outputArea">
+<div class="jp-OutputArea-child">
+<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="application/vnd.jupyter.stderr" tabindex="0">
+<pre>/nfs-share/home/2406184221/.local/lib/python3.12/site-packages/statsmodels/tsa/holtwinters/model.py:918: ConvergenceWarning: Optimization failed to converge. Check mle_retvals.
+  warnings.warn(
+/nfs-share/home/2406184221/.local/lib/python3.12/site-packages/statsmodels/tsa/holtwinters/model.py:918: ConvergenceWarning: Optimization failed to converge. Check mle_retvals.
+  warnings.warn(
+/nfs-share/home/2406184221/.local/lib/python3.12/site-packages/statsmodels/tsa/holtwinters/model.py:918: ConvergenceWarning: Optimization failed to converge. Check mle_retvals.
+  warnings.warn(
+/nfs-share/home/2406184221/.local/lib/python3.12/site-packages/statsmodels/tsa/holtwinters/model.py:918: ConvergenceWarning: Optimization failed to converge. Check mle_retvals.
+  warnings.warn(
+</pre>
+</div>
+</div>
+<div class="jp-OutputArea-child">
+<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
+<pre>+------------------+
+|      Overall_MAPE|
++------------------+
+|0.9860567355464035|
++------------------+
+
+</pre>
+</div>
+</div>
+<div class="jp-OutputArea-child">
+<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="application/vnd.jupyter.stderr" tabindex="0">
+<pre>                                                                                </pre>
+</div>
+</div>
+</div>
+</div>
 </div></section></section><section><section>
 <div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
 <div class="jp-Cell-inputWrapper" tabindex="0">
@@ -7471,217 +8090,11 @@ main {
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h2 id="Hierarchical-time-series:-Australian-tourism">Hierarchical time series: Australian tourism<a class="anchor-link" href="#Hierarchical-time-series:-Australian-tourism">¶</a></h2><ul>
-<li><p>Australia is divided into six states and two territories, with each one having its own government and some economic and administrative autonomy.</p>
-</li>
-<li><p>For simplicity, we refer to both states and territories as “states”. Each of these states can be further subdivided into regions.</p>
-</li>
-<li><p>In total there are 76 such regions. Business planners and tourism authorities are interested in forecasts for the whole of Australia, for each of the states and territories, and also for the regions.</p>
-</li>
-</ul>
-</div>
-</div>
-</div>
-</div></section></section><section><section>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
-</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<p><img alt="Austrilia" src="figures/ausmap.png"/></p>
-</div>
-</div>
-</div>
-</div></section></section><section><section>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
-</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<p><img alt="HTS" src="figures/hts.png"/></p>
-<ul>
-<li><p>A simple hierarchical structure. At the top of the hierarchy is the “Total”, the most aggregate level of the data.</p>
-</li>
-<li><p>The total number of series in the hierarchy is $n=1+2+5=8$, while the number of series at the bottom level is $m=5$. Note that $n&gt;m$ in all hierarchies.</p>
-</li>
-</ul>
-</div>
-</div>
-</div>
-</div></section></section><section><section>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
-</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h1 id="Matrix-notation">Matrix notation<a class="anchor-link" href="#Matrix-notation">¶</a></h1><p>\begin{equation*}
-\begin{bmatrix}
-    y_{t} \\
-    y_{A,t} \\
-    y_{B,t} \\
-    y_{AA,t} \\
-    y_{AB,t} \\
-    y_{AC,t} \\
-    y_{BA,t} \\
-    y_{BB,t}
-\end{bmatrix}
-  =
-  \begin{bmatrix}
-    1 &amp; 1 &amp; 1 &amp; 1 &amp; 1 \\
-    1 &amp; 1 &amp; 1 &amp; 0 &amp; 0 \\
-    0 &amp; 0 &amp; 0 &amp; 1 &amp; 1 \\
-    1  &amp; 0  &amp; 0  &amp; 0  &amp; 0  \\
-    0  &amp; 1  &amp; 0  &amp; 0  &amp; 0  \\
-    0  &amp; 0  &amp; 1  &amp; 0  &amp; 0  \\
-    0  &amp; 0  &amp; 0  &amp; 1  &amp; 0  \\
-    0  &amp; 0  &amp; 0  &amp; 0  &amp; 1
-  \end{bmatrix}
-  \begin{bmatrix}
-    y_{AA,t} \\
-    y_{AB,t} \\
-    y_{AC,t} \\
-    y_{BA,t} \\
-    y_{BB,t}
-  \end{bmatrix}
-\end{equation*}</p>
-<p>or in more compact notation</p>
-<p>\begin{equation}
-  \mathbf{y}_t=\mathbf{S}\mathbf{b}_{t},
-\end{equation}</p>
-</div>
-</div>
-</div>
-</div></section></section><section><section>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
-</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h1 id="Mapping-matrices">Mapping matrices<a class="anchor-link" href="#Mapping-matrices">¶</a></h1><ul>
-<li><p>Suppose we forecast all series ignoring any aggregation constraints. We call these the base forecasts and denote them by $\mathbf{y}_h$ where $h$ is the forecast horizon. They are stacked in the same order as the data $\mathbf{y}_t$.</p>
-</li>
-<li><p>Then all <strong>coherent</strong> forecasting approaches for either hierarchical or grouped structures can be represented as</p>
-</li>
-</ul>
-<p>\begin{equation}
-  \tilde{\mathbf{y}}_h=\mathbf{S}\mathbf{G}\hat{\mathbf{y}}_h,
-\end{equation}</p>
-</div>
-</div>
-</div>
-</div></section></section><section><section>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
-</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<ul>
-<li>The $\mathbf{G}$ matrix is defined according to the approach implemented. For example if the <strong>bottom-up</strong> approach is used to forecast the hierarchy, then</li>
-</ul>
-<p>\begin{equation*}
-\mathbf{G}=
-  \begin{bmatrix}
-    0 &amp; 0 &amp; 0 &amp; 1 &amp; 0 &amp; 0 &amp; 0 &amp; 0\\
-    0 &amp; 0 &amp; 0 &amp; 0 &amp; 1 &amp; 0 &amp; 0 &amp; 0\\
-    0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 1 &amp; 0 &amp; 0\\
-    0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 1 &amp; 0\\
-    0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 1\\
-  \end{bmatrix}
-\end{equation*}</p>
-<ul>
-<li>If any of the <strong>top-down</strong> approaches were used then</li>
-</ul>
-<p>\begin{equation*}
-\mathbf{G}=
-    \begin{bmatrix}
-      p_1 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0\\
-      p_2 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0\\
-      p_3 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0\\
-      p_4 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0\\
-      p_5 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0\\
-    \end{bmatrix}.
-\end{equation*}</p>
-</div>
-</div>
-</div>
-</div></section></section><section><section>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
-</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<p><img alt="tourismRegions" src="figures/tourismRegions.png"/></p>
-</div>
-</div>
-</div>
-</div></section></section><section><section>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
-</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<p><img alt="tourismStates" src="figures/tourismStates.png"/></p>
-</div>
-</div>
-</div>
-</div></section></section><section><section>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
-</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h1 id="Grouped-time-series">Grouped time series<a class="anchor-link" href="#Grouped-time-series">¶</a></h1><ul>
-<li><p>With grouped time series, the data structure does not naturally disaggregate in a unique hierarchical manner.</p>
-</li>
-<li><p>At the top of the grouped structure is the Total, the most aggregate level of the data, again represented by $y_t$.</p>
-</li>
-<li><p>The Total can be disaggregated by attributes (A, B) forming series $y_{A,t}$ and $y_{B,t}$, or by attributes $(X, Y)$ forming series $y_{X,t}$ and $y_{Y,t}$.</p>
-</li>
-<li><p>At the bottom level, the data are disaggregated by both attributes.</p>
-</li>
-</ul>
-<p><img alt="GroupTree" src="figures/GroupTree.png"/></p>
-</div>
-</div>
-</div>
-</div></section></section><section><section>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
-</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h1 id="Forecast-reconciliation">Forecast reconciliation<a class="anchor-link" href="#Forecast-reconciliation">¶</a></h1><ul>
-<li><p>The traditional methods considered so far are limited in that they only use base forecasts from a single level of aggregation which have either been aggregated or disaggregated to obtain forecasts at all other levels. Hence, they use limited information.</p>
-</li>
-<li><p>However, in general, we could use other $\mathbf{G}$ matrices, and then $\mathbf{SG}$ combines and reconciles all the base forecasts in order to produce coherent forecasts.</p>
-</li>
-<li><p>In fact, we can find the optimal $\mathbf{G}$ matrix to give the most accurate reconciled forecasts.</p>
-</li>
-</ul>
-</div>
-</div>
-</div>
-</div></section></section><section><section>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
-</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h2 id="Further-Reading">Further Reading<a class="anchor-link" href="#Further-Reading">¶</a></h2><ul>
-<li><p>Gross, C. W., &amp; Sohl, J. E. (1990). Disaggregation methods to expedite product line forecasting. Journal of Forecasting, 9, 233–254. DOI: <a href="https://doi.org/10.1002/for.3980090304">https://doi.org/10.1002/for.3980090304</a> provide a good introduction to the top-down approaches.</p>
-</li>
-<li><p>Athanasopoulos, G., Gamakumara, P., Panagiotelis, A., Hyndman, R.J., Affan, M. (2020). Hierarchical Forecasting. In: Fuleky, P. (eds) Macroeconomic Forecasting in the Era of Big Data. Advanced Studies in Theoretical and Applied Econometrics, vol 52. Springer, Cham. DOI: <a href="https://doi.org/10.1007/978-3-030-31150-6_21">https://doi.org/10.1007/978-3-030-31150-6_21</a></p>
-</li>
+<h2 id="Summary-of-MinT-OLS">Summary of MinT-OLS<a class="anchor-link" href="#Summary-of-MinT-OLS">¶</a></h2><ul>
+<li><strong>MinT-OLS (simple projection)</strong></li>
+<li><strong>No covariance matrix needed</strong></li>
+<li><strong>Coherent forecasts at Parent_Group level</strong></li>
+<li><strong>Evaluated using MAPE</strong></li>
 </ul>
 </div>
 </div>
