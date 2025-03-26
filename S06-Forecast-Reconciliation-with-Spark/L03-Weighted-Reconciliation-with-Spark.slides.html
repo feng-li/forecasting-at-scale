@@ -7730,7 +7730,7 @@ only showing top 20 rows
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
+</div></section></section><section><section><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -7842,7 +7842,7 @@ only showing top 20 rows
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
+</div></section></section><section><section><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -7870,7 +7870,7 @@ only showing top 20 rows
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
+</div></section></section><section><section><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -8094,7 +8094,7 @@ only showing top 20 rows
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
+</div></section></section><section><section><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -8165,6 +8165,26 @@ only showing top 20 rows
 <li><p><strong>MinT-WLS</strong> in Spark is approximate — no matrix inversion is used.</p>
 </li>
 <li><p>For full matrix-based MinT with off-diagonal covariance, it requires distributed matrix inversion techniques</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</div></section></section><section><section>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<h2 id="Matrix-inversion-in-Spark">Matrix inversion in Spark<a class="anchor-link" href="#Matrix-inversion-in-Spark">¶</a></h2><ul>
+<li><p>Apache Spark’s MLlib library includes some linear algebra tools under pyspark.ml.linalg. You can create matrices, multiply them, and do some decompositions.</p>
+</li>
+<li><p>But: no direct <code>.inverse()</code> method is exposed in PySpark.</p>
+</li>
+<li><p>But in <strong>Scala</strong>, a <strong>non-distributed version</strong> <code>Matrices.dense(...).inverse()</code> exists via Breeze module.</p>
+</li>
+<li><p>Distributed inversion is a very difficult problem.</p>
 </li>
 </ul>
 </div>
