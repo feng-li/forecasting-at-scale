@@ -13,4 +13,4 @@ zipcode:
 	zip -r bdcf-slides.zip S* README.md requirements.txt setup.py setup_spark.sh -x "*/.ipynb_checkpoints/*"
 
 sync:
-	rsync -av --delete-excluded --prune-empty-dirs --include '*/' --include '*slides.zip' --include 'data/*' --include '*.ipynb' --include '*.slides.html' --include 'figures/*' --exclude '*' .  ${HOME}/nextcloud/feng.li/bdcf/
+	rsync -av --delete-excluded --prune-empty-dirs --include '*/' --include '*slides.zip' --include 'data/*' --include '*.ipynb' --include '*.slides.html' --include '*.slides.pdf' --include 'figures/*' --exclude '*' .  ${HOME}/nextcloud/feng.li/bdcf/
